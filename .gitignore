@@ -1,0 +1,32 @@
+# Virtual environment
+/venv-web
+
+# Claude
+CLAUDE.md
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+
+# Original files (kept locally, not needed in repo)
+/personal_files/
+/html/
+
+# Python
+__pycache__/
+*.pyc
+scripts/update_summary.txt
+
+# Draft pages (kept locally, not deployed)
+resources.html
+blog.html
+photography.html
+about.html
+teaching.html
+
+# Legacy CV page (downloads moved to Publications page)
+cv.html

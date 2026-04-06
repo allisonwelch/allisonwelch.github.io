@@ -1,0 +1,63 @@
+name: Check for New Publications
+
+on:
+  # Run weekly on Monday mornings
+  schedule:
+    - cron: '0 9 * * 1'
+  # Allow manual trigger
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-publications:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run publication checker
+        id: check
+        run: python scripts/update_publications.py
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request
+        if: steps.changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'feat: update publications from ORCID'
+          title: 'New publications detected from ORCID'
+          body: |
+            ## Automated Publication Update
+
+            New publications were detected on your ORCID profile (0000-0002-2314-7625).
+
+            Please review the changes to `assets/data/publications.json` and update
+            `publications.html` if needed.
+
+            **Note:** You may want to:
+            - Add PDF files for new publications to `assets/pdfs/`
+            - Update author formatting in `publications.html`
+            - Add any missing metadata
+
+            ---
+            *This PR was automatically created by the publication checker workflow.*
+          branch: auto/update-publications
+          labels: publications, automated
