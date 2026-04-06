@@ -15,6 +15,7 @@ Thumbs.db
 # Original files (kept locally, not needed in repo)
 /personal_files/
 /html/
+/photography
 
 # Python
 __pycache__/
