@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://allisonwelch.github.io/sitemap.xml
