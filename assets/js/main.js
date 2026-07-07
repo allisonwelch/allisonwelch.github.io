@@ -47,6 +47,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Auto-update sidebar counts from live DOM
+    document.querySelectorAll('.sidebar-item-meta[data-count-selector]').forEach(meta => {
+        const selector = meta.dataset.countSelector;
+        const label = meta.dataset.countLabel;
+        const sidebarItem = meta.closest('.sidebar-item');
+        const href = sidebarItem && sidebarItem.getAttribute('href');
+        const section = href && document.querySelector(href);
+        if (section) {
+            const count = section.querySelectorAll(selector).length;
+            meta.textContent = `${count} ${label}${count !== 1 ? 's' : ''}`;
+        }
+    });
+
     // Sidebar section scrolling — click to scroll
     const sidebarItems = document.querySelectorAll('.sidebar-item');
     let isClickScrolling = false;
