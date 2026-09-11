@@ -158,6 +158,10 @@ def save_publications(publications):
     print(f"Saved {len(publications)} publications to {PUBS_JSON}")
 
 
+def is_preprint(pub):
+    return (pub.get("type") or "").strip().lower() == "preprint"
+
+
 def find_new_publications(current, existing):
     existing_dois   = {p.get("doi", "").lower()   for p in existing if p.get("doi")}
     existing_titles = {p.get("title", "").lower()  for p in existing if p.get("title")}
@@ -365,6 +369,20 @@ def main():
     print(f"Found {len(existing_pubs)} existing publications in local database")
 
     new_pubs = find_new_publications(current_pubs, existing_pubs)
+
+    # Preprints are never auto-added — Allison only wants published works picked
+    # up automatically. Drop them from current_pubs too so they aren't silently
+    # written into publications.json without a corresponding HTML entry.
+    skipped_preprints = [p for p in new_pubs if is_preprint(p)]
+    if skipped_preprints:
+        for p in skipped_preprints:
+            print(f"  Skipping preprint (not auto-added): {p['title']}")
+        skipped_keys = {(p.get("doi", "").lower(), p.get("title", "").lower()) for p in skipped_preprints}
+        current_pubs = [
+            p for p in current_pubs
+            if (p.get("doi", "").lower(), p.get("title", "").lower()) not in skipped_keys
+        ]
+        new_pubs = [p for p in new_pubs if not is_preprint(p)]
 
     if not new_pubs:
         print("No new publications found. Everything is up to date!")
